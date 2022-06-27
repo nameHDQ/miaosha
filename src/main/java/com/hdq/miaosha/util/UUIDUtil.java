@@ -11,4 +11,8 @@ public class UUIDUtil {
 		// 去掉“-”符号
 		return UUID.randomUUID().toString().replace("-", "");
 	}
+
+	public static void main(String[] args) {
+		System.out.println(UUID.randomUUID().toString());
+	}
 }

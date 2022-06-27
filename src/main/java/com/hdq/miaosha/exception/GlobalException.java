@@ -3,7 +3,7 @@ package com.hdq.miaosha.exception;
 import com.hdq.miaosha.result.CodeMsg;
 
 /**
- * 所有的全局异常
+ * 自定义异常异常
  * @author hdq
  */
 public class GlobalException extends RuntimeException {

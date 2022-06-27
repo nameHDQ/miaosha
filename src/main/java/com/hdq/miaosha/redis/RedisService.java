@@ -76,6 +76,7 @@ public class RedisService {
         try {
             // 通过连接池获取 jedis
             jedis = jedisPool.getResource();
+            // 转换成json
             String str = beanToValue(value);
             if (str == null || str.length() <= 0){
                 return false;
@@ -176,6 +177,26 @@ public class RedisService {
             jedis = jedisPool.getResource();
             String realKey = prefix.getPrefix() + key;
             return jedis.decr(realKey);
+        }finally {
+            returnToPoll(jedis);
+        }
+    }
+
+
+    /**
+     *@Description : 删除
+     *@Author : huangdaoquan
+     *@Date : 2022/6/27 17:40
+     *@Version : 1.0
+     **/
+    public boolean delete(KeyPrefix prefix, String key){
+        Jedis jedis = null;
+        try {
+            // 通过连接池获取 jedis
+            jedis = jedisPool.getResource();
+            String realKey = prefix.getPrefix() + key;
+            Long del = jedis.del(realKey);
+            return del > 0;
         }finally {
             returnToPoll(jedis);
         }

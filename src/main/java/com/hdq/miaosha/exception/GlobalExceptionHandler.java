@@ -33,6 +33,7 @@ public class GlobalExceptionHandler {
             GlobalException ex = (GlobalException) e;
             return Result.error(ex.getCodeMsg());
         }else if (e instanceof BindException) {
+            // 绑定异常
             // 参数校验异常 BindException springboot validation
             BindException bindException = (BindException) e;
             List<ObjectError> allErrors = bindException.getAllErrors();

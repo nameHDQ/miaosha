@@ -52,7 +52,7 @@ public class LoginController {
      */
     @ResponseBody
     @RequestMapping("/do_login")
-    public Result<Boolean> doLogin(HttpServletResponse response, @Validated LoginVo loginVo){
+    public Result<String> doLogin(HttpServletResponse response, @Validated LoginVo loginVo){
         log.info(loginVo.toString());
 //        String mobile = loginVo.getMobile();
 //        String password = loginVo.getPassword();
@@ -67,8 +67,8 @@ public class LoginController {
 //            return Result.error(CodeMsg.PASSWORD_EMPTY);
 //        }
         //登陆
-        boolean login = miaoshaUserServicce.login(response, loginVo);
-        return Result.success(true);
+        String token = miaoshaUserServicce.login(response, loginVo);
+        return Result.success(token);
     }
 
 }

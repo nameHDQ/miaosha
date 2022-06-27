@@ -5,7 +5,8 @@ import com.hdq.miaosha.domain.Goods;
 import java.util.Date;
 
 /**
- * 继承Goods，同时也继承了Goods的属性 所以可以访问属性
+ * 继承Goods，就拥有了Goods的属性
+ * 连接goods和秒杀信息表，把两个表的信息合到一块
  * @author hdq
  */
 public class GoodsVo extends Goods {
