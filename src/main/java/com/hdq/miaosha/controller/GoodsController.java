@@ -3,8 +3,10 @@ package com.hdq.miaosha.controller;
 import com.hdq.miaosha.domain.MiaoshaUser;
 import com.hdq.miaosha.redis.GoodsKey;
 import com.hdq.miaosha.redis.RedisService;
+import com.hdq.miaosha.result.Result;
 import com.hdq.miaosha.service.GoodsService;
 import com.hdq.miaosha.service.MiaoshaUserServicce;
+import com.hdq.miaosha.vo.GoodsDetailVo;
 import com.hdq.miaosha.vo.GoodsVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +46,7 @@ public class GoodsController {
     /**
      * 商品列表详情
      *
-     * 重要：*******页面缓存技术：页面缓存的redis-key有效期一般比较短（60s），主要是防止瞬间用户的访问量突然加大的情况，如果时间太长，导致数据
+     * 重要：*******页面缓存技术(html和页面显示的数据都缓存起来)：页面缓存的redis-key有效期一般比较短（60s），主要是防止瞬间用户的访问量突然加大的情况，如果时间太长，导致数据
      * 的实时性比较低
      *
      * 重要：*******一般为了兼容游览器 会把token放在游览器的请求参数里面 所以也要判断请求参数里面是否有token
@@ -100,7 +102,9 @@ public class GoodsController {
     /**
       * @Description: todo:一般如果数据库里goods ID自增，那么很容易别人就从1开始for循环遍历
       * 解决方案：**************snowflake算法（很重要，要去做的）***************
-      * 页面缓存：物品详情要针对不同物品的ID单独设置缓存的key：  classname + goodsID 粒度更细
+      * URL缓存：物品详情要针对不同物品的ID单独设置缓存的key：  classname + goodsID 粒度更细
+      * 每一个物品的详情页面因ID不同 进而URL不同，所以把带ID的html存到缓存中，实现URL缓存
+      * 与页面缓存的区别在于多了一个ID
       * @Author: huangdaoquan
       * @Date: 2022/6/20 11:15
       * @Param model:
@@ -109,9 +113,9 @@ public class GoodsController {
       * @return: java.lang.String
       * @Version: 1.0
       **/
-    @RequestMapping(value = "/to_detail/{goodsId}", produces = "text/html")
+    @RequestMapping(value = "/to_detail2/{goodsId}", produces = "text/html")
     @ResponseBody
-    public String toDetail( HttpServletResponse response,
+    public String toDetail2( HttpServletResponse response,
                             HttpServletRequest request,Model model, MiaoshaUser miaoshaUser, @PathVariable("goodsId") long goodsId){
 
         // 先从缓存里取
@@ -155,6 +159,49 @@ public class GoodsController {
             redisService.set(GoodsKey.getGoodsDetail, "" + goodsId, html);
         }
         return html;
+    }
+
+
+    /**
+     *@Description : 页面静态化：页面只存储html，动态数据通过接口获取
+     * 页面是静态的html，但是数据是动态ajax（或者其他vue，angular等框架）获取的
+     *@Author : huangdaoquan
+     *@Date : 2022/6/27 19:30
+     *@Version : 1.0
+     **/
+    @RequestMapping(value = "/detail/{goodsId}")
+    @ResponseBody
+    public Result<GoodsDetailVo> toDetail(HttpServletResponse response,
+                                           HttpServletRequest request, Model model, MiaoshaUser miaoshaUser, @PathVariable("goodsId") long goodsId){
+
+        GoodsVo goodsVo = goodsService.getGoodsVoByGoodsId(goodsId);
+
+        // 秒杀开始和结束时间
+        long startAt = goodsVo.getStartDate().getTime();
+        long endAt = goodsVo.getEndDate().getTime();
+        long now = System.currentTimeMillis();
+
+        // 秒杀状态
+        int miaoshaStatus = 0;
+        int remainSeconds = 0;
+
+        if (now < startAt){//秒杀没开始
+            miaoshaStatus = 0;
+            remainSeconds = (int) ((startAt - now) /1000);
+        }else if (now > endAt){//秒杀结束
+            miaoshaStatus = 2;
+            remainSeconds = -1;
+        }else {// 秒杀进行
+            miaoshaStatus = 1;
+            remainSeconds = 0;
+        }
+
+        GoodsDetailVo goodsDetailVo = new GoodsDetailVo();
+        goodsDetailVo.setGoodsVo(goodsVo);
+        goodsDetailVo.setMiaoshaUser(miaoshaUser);
+        goodsDetailVo.setMiaoshaStatus(miaoshaStatus);
+        goodsDetailVo.setRemainSeconds(remainSeconds);
+        return Result.success(goodsDetailVo);
     }
 
 }

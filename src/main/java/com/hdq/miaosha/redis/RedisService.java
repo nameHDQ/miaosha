@@ -47,7 +47,7 @@ public class RedisService {
      * @return
      */
     //: TODO: 2022/2/3 支持list类型 转换
-    private <T> T stringToBean(String str, Class<T> clazz) {
+    public static <T> T stringToBean(String str, Class<T> clazz) {
         if (str == null || str.length() == 0 || clazz == null){
             return null;
         }
@@ -102,7 +102,7 @@ public class RedisService {
      * @return
      */
     // TODO: 2022/2/3 支持list类型 转换
-    private <T> String beanToValue(T value) {
+    public static <T> String beanToValue(T value) {
         if (value == null){
             return null;
         }

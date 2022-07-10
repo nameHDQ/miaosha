@@ -32,10 +32,18 @@ public class GoodsService {
         return goodsDao.getGoodsVoByGoodsId(goodsId);
     }
 
-
-    public void reduceStock(GoodsVo goodsVo) {
+    /**
+      * @Description: 判断减库存是否成功
+      * @Author: huangdaoquan
+      * @Date: 2022/7/2 19:56
+      * @Param goodsVo:
+      * @return: boolean
+      * @Version: 1.0
+      **/
+    public boolean reduceStock(GoodsVo goodsVo) {
         MiaoshaGoods goods = new MiaoshaGoods();
         goods.setGoodsId(goodsVo.getId());
-        goodsDao.reduceStock(goods);
+        int ret = goodsDao.reduceStock(goods);
+        return  ret > 0;
     }
 }

@@ -173,8 +173,8 @@ function doMiaosha(path){
 function render(detail){
 	var miaoshaStatus = detail.miaoshaStatus;
 	var  remainSeconds = detail.remainSeconds;
-	var goods = detail.goods;
-	var user = detail.user;
+	var goods = detail.goodsVo;
+	var user = detail.miaoshaUser;
 	if(user){
 		$("#userTip").hide();
 	}
@@ -201,6 +201,7 @@ function getDetail(){
 		type:"GET",
 		success:function(data){
 			if(data.code == 0){
+                // 渲染html页面
 				render(data.data);
 			}else{
 				layer.msg(data.msg);
